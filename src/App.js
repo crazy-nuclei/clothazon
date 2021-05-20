@@ -42,7 +42,7 @@ class App extends Component {
         })
       }
 
-      else this.state.currentUser = null;
+      else this.setState({ currentUser: userAuth });
     })
   }
 
