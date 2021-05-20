@@ -4,7 +4,7 @@ import { Homepage } from './pages/homepage/homepage.component';
 import ShopPage from './pages/shoppage/shop.component';
 import Header from './components/header/header.component';
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
-import { auth } from './firebase/firebase.utils';
+import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 import React, { Component } from 'react';
 
 const Hatspage = () => (
@@ -26,9 +26,23 @@ class App extends Component {
   unSubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unSubscribeFromAuth = auth.onAuthStateChanged(user => {
-      this.setState({ currentUser: user });
-      console.log(this.state.currentUser);
+    this.unSubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
+        userRef.onSnapshot(snapshot => {
+          this.setState(
+            {
+              currentUser: {
+                id: snapshot.id,
+                ...snapshot.data()
+              }
+            }, () => console.log(this.state)
+          )
+        })
+      }
+
+      else this.state.currentUser = null;
     })
   }
 
